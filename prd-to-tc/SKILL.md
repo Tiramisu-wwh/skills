@@ -1,6 +1,7 @@
 ---
 name: prd-to-tc-generator
 description: AI驱动的PRD测试用例生成器，使用Claude智能分析Word/PDF文档和Figma设计，创建结构化测试用例表格和Midscene兼容的UI自动化脚本。当Claude需要从PRD文档生成综合测试用例时使用：(1) 需求分析和测试规划，(2) 功能和UI测试用例创建，(3) Midscene自动化脚本生成。
+allowed-tools: [Read, Write, mcp__figma__get_figma_data, mcp__figma__download_figma_images]
 ---
 
 # PRD测试用例生成器
@@ -36,10 +37,10 @@ description: AI驱动的PRD测试用例生成器，使用Claude智能分析Word/
 ### 处理流程
 
 #### 阶段1：文档内容提取
-我使用辅助脚本提取原始内容：
+我使用相应的方式提取原始内容：
 - Word: `python scripts/content_extractor.py --word <文件路径>`
 - PDF: `python scripts/content_extractor.py --pdf <文件路径>`
-- Figma: `python scripts/figma_extractor.py <链接>`
+- Figma: **直接通过Figma MCP获取设计数据**，无需脚本中间层
 
 #### 阶段2：AI智能分析
 我基于提取的内容进行深度分析：
@@ -49,6 +50,17 @@ description: AI驱动的PRD测试用例生成器，使用Claude智能分析Word/
 - 分析用户角色和使用场景
 - 梳理业务流程和数据流转
 - 理解UI设计和交互要求
+
+**特殊处理：Figma设计分析**
+当输入为Figma链接时：
+1. **URL解析**：从Figma链接中提取file_key和可选的node_id
+2. **MCP数据获取**：使用 `mcp__figma__get_figma_data` 获取结构化设计数据
+3. **设计分析**：
+   - 解析页面布局、组件层次、交互流程
+   - 识别UI元素类型（按钮、输入框、文本、图片等）
+   - 提取设计规范（颜色、字体、间距、尺寸）
+   - 理解用户交互路径和业务流程
+4. **图片资源获取**：如需要，使用 `mcp__figma__download_figma_images` 获取设计图片
 
 **测试策略制定**：
 - 确定测试范围和优先级
@@ -64,7 +76,7 @@ description: AI驱动的PRD测试用例生成器，使用Claude智能分析Word/
 - 数据测试：验证数据完整性和准确性
 - 集成测试：验证模块间交互
 
-**UI自动化测试用例**：参考 `references/midscene_patterns.md`
+**UI自动化测试用例**：参考 `references/ui_prompt_engineering.md`
 - 自然语言描述的测试步骤
 - 具体的元素定位和交互描述
 - 完整的验证断言和预期结果
@@ -73,11 +85,12 @@ description: AI驱动的PRD测试用例生成器，使用Claude智能分析Word/
 #### 阶段4：结果导出
 
 **创建输出文件的文件夹**：
-- 在PRD所在目录创建文件夹
-**文件命名**：PRD名称+YYYY-MM-DDTHH-mm-SS
-- 后续生成的文件都放在该文件夹内
+- 在目录`/Users/wwh/Documents/R2ai/AI/AI智能平台/PRDtoTC`创建文件夹
+**文件夹命名**：PRD名称/figma标题名称+YYYY-MM-DDTHH-mm-SS
+- 后续生成的文件都保存至该文件夹内
 
 **功能测试用例CSV导出要求**：
+- cd至创建的文件夹内进行保存
 **重要：生成CSV格式文件，使用制表符分隔，Excel可以完美打开和编辑**
 - 使用 `Write` 工具生成 `.csv` 格式文件，字段用制表符(`\t`)分隔
 - **首先参考 `assets/基础用例模板.csv` 文件结构**，确保列名和格式完全一致
@@ -99,14 +112,17 @@ description: AI驱动的PRD测试用例生成器，使用Claude智能分析Word/
 **文件命名**：测试用例_YYYY-MM-DDTHH-mm-SS.csv
 
 **UI自动化用例导出要求**：
+- cd至创建的文件夹内进行保存
 - 使用Markdown格式，包含完整阶段3生成的UI自动化测试用例内容
 **文件命名**：UI测试用例_YYYY-MM-DDTHH-mm-SS.md
 
 **测试分析报告导出要求**：
+- cd至创建的文件夹内进行保存
 **文件命名**：测试分析报告_YYYY-MM-DDTHH-mm-SS.md
 
 ## 示例使用
 
+### Word/PDF文档示例
 ```
 用户: 请分析这个PRD文档生成测试用例：/path/to/prd.docx
 
@@ -114,11 +130,31 @@ description: AI驱动的PRD测试用例生成器，使用Claude智能分析Word/
    2. 完成需求分析，识别出15个功能需求
    3. 生成45个测试用例（含正向/异常/边界测试）
    4. 创建12个UI自动化测试用例
-   5. 导出Excel和Markdown格式结果
+   5. 创建文件夹
+   6. 导出Excel和Markdown格式结果
 
    结果文件：
    - test_cases_20241128.csv (45个测试用例)
    - ui_tests_20241128.md (12个UI测试用例)
+```
+
+### Figma设计链接示例
+```
+用户: 请分析这个Figma设计生成测试用例：https://www.figma.com/design/HYj43oecdPu8gyeH5BaAFl/ADME统计系统?node-id=130-8805
+
+我: 1. 正在解析Figma链接...
+   2. 获取设计数据：file_key=HYj43oecdPu8gyeH5BaAFl, node_id=130-8805
+   3. 分析UI设计，识别出8个页面和25个交互组件
+   4. 完成需求分析，推导出12个功能需求
+   5. 生成36个测试用例（含UI交互测试、业务流程测试）
+   6. 创建18个UI自动化测试用例（基于Midscene自然语言描述）
+   7. 创建文件夹
+   8. 导出Excel和Markdown格式结果
+
+   结果文件：
+   - test_cases_20241128.csv (36个测试用例)
+   - ui_tests_20241128.md (18个UI测试用例)
+   - test_analysis_report_20241128.md (测试分析报告)
 ```
 
 ## 依赖要求
@@ -128,42 +164,29 @@ description: AI驱动的PRD测试用例生成器，使用Claude智能分析Word/
 pip install python-docx pandas openpyxl PyPDF2
 ```
 
-## 优化后的实现架构
-
-### 技能文件结构
-```
-.claude/skills/prd-to-tc/
-├── SKILL.md                    # 技能说明文档
-└── scripts/
-    ├── content_extractor.py    # 文档内容提取器
-    └── figma_extractor.py      # Figma设计提取器
-```
-
-### 优化要点
-
-1. **明确的职责分离**：
-   - Claude AI：负责需求分析、测试用例设计、智能决策和结果输出
-   - 脚本：仅负责文档内容提取的技术性操作
-
-2. **简化的调用流程**：
-   - 使用脚本提取原始文档内容
-   - Claude AI直接分析并生成完整测试用例
-   - 直接输出到目标格式文件
-
-3. **更好的用户体验**：
-   - 清晰的进度反馈
-   - 标准化的输出格式
-   - 零配置的简单使用方式
-
 ## 直接使用方式
 
 现在你可以直接对我说：
+
+**Word/PDF文档**：
 ```
 "请分析这个PRD文档生成测试用例：/path/to/document.docx"
 ```
 
+**Figma设计链接**：
+```
+"请分析这个Figma设计生成测试用例：https://www.figma.com/design/xxx/项目名称?node-id=xxx"
+```
+
+**直接文本内容**：
+```
+"请分析以下PRD内容生成测试用例：[粘贴PRD文本内容]"
+```
+
 我将：
-1. 自动提取文档内容
-2. 进行AI智能分析
-3. 生成完整的测试用例
-4. 导出Excel和Markdown格式文件
+1. **智能识别输入类型**（文档/Figma链接/文本）
+2. **自动提取内容**（脚本解析/MCP获取/直接分析）
+3. **进行AI智能分析**（需求识别/测试策略制定）
+4. **生成完整的测试用例**（功能测试/UI自动化）
+5. **创建文件夹**
+6. **导出结构化文件**（Excel CSV + Markdown）
