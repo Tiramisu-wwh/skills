@@ -1,6 +1,6 @@
 ---
 name: prd-to-tc-generator
-description: AI驱动的PRD测试用例生成器，使用Claude智能分析Word/PDF文档和Figma设计，创建结构化测试用例表格和Midscene兼容的UI自动化脚本。当Claude需要从PRD文档生成综合测试用例时使用：(1) 需求分析和测试规划，(2) 功能和UI测试用例创建，(3) Midscene自动化脚本生成。
+description: AI驱动的PRD测试用例生成器，使用Claude智能分析Word/PDF文档和Figma设计，创建结构化测试用例表格和自然语言描述的UI自动化测试用例。当Claude需要从PRD文档生成综合测试用例时使用：(1) 需求分析和测试规划，(2) 功能和UI测试用例创建，（3）测试分析报告
 allowed-tools: [Read, Write, mcp__figma__get_figma_data, mcp__figma__download_figma_images]
 ---
 
@@ -77,10 +77,9 @@ allowed-tools: [Read, Write, mcp__figma__get_figma_data, mcp__figma__download_fi
 - 集成测试：验证模块间交互
 
 **UI自动化测试用例**：参考 `references/ui_prompt_engineering.md`
-- 自然语言描述的测试步骤
-- 具体的元素定位和交互描述
+- 用自然语言描述的测试步骤
+- 元素位置和交互描述
 - 完整的验证断言和预期结果
-- 错误处理和恢复机制
 
 #### 阶段4：结果导出
 
@@ -91,22 +90,14 @@ allowed-tools: [Read, Write, mcp__figma__get_figma_data, mcp__figma__download_fi
 
 **功能测试用例CSV导出要求**：
 - cd至创建的文件夹内进行保存
-**重要：生成CSV格式文件，使用制表符分隔，Excel可以完美打开和编辑**
-- 使用 `Write` 工具生成 `.csv` 格式文件，字段用制表符(`\t`)分隔
-- **首先参考 `assets/基础用例模板.csv` 文件结构**，确保列名和格式完全一致
-- 如果模板文件存在，先使用Read工具读取模板，获取标准的列名和格式
+**重要：生成CSV格式文件**
+- **首先参考 `assets/基础用例模板.xlsx` 文件结构**，确保列名和格式完全一致
 
 **模板参考步骤**：
-1. 使用Read工具读取 `assets/基础用例模板.csv` 文件（如果存在）
+1. 读取 `assets/基础用例模板.xlsx` 文件（如果存在）
 2. 分析模板的列名结构和格式
 3. 按照模板结构生成对应的CSV内容
 4. 确保字段顺序和命名与模板完全一致
-
-**标准CSV格式**：
-- 第一行为表头，字段用制表符分隔
-- 每行一个测试用例，字段用制表符分隔
-- 测试步骤用换行符(`\n`)分隔，保持在单个单元格内
-- 文件编码为UTF-8，确保中文正常显示
 
 **标准字段结构**（严格遵循模板）
 **文件命名**：测试用例_YYYY-MM-DDTHH-mm-SS.csv
@@ -147,7 +138,7 @@ allowed-tools: [Read, Write, mcp__figma__get_figma_data, mcp__figma__download_fi
    3. 分析UI设计，识别出8个页面和25个交互组件
    4. 完成需求分析，推导出12个功能需求
    5. 生成36个测试用例（含UI交互测试、业务流程测试）
-   6. 创建18个UI自动化测试用例（基于Midscene自然语言描述）
+   6. 创建18个UI自动化测试用例（自然语言描述）
    7. 创建文件夹
    8. 导出Excel和Markdown格式结果
 
