@@ -88,19 +88,19 @@ allowed-tools: [Read, Write, mcp__figma__get_figma_data, mcp__figma__download_fi
 **文件夹命名**：PRD名称/figma标题名称+YYYY-MM-DDTHH-mm-SS
 - 后续生成的文件都保存至该文件夹内
 
-**功能测试用例CSV导出要求**：
+**功能测试用例XLSX导出要求**：
 - cd至创建的文件夹内进行保存
-**重要：生成CSV格式文件**
+**重要：生成XLSX格式文件**
 - **首先参考 `assets/基础用例模板.xlsx` 文件结构**，确保列名和格式完全一致
 
 **模板参考步骤**：
 1. 读取 `assets/基础用例模板.xlsx` 文件（如果存在）
 2. 分析模板的列名结构和格式
-3. 按照模板结构生成对应的CSV内容
+3. 按照模板结构生成对应的xlsx内容
 4. 确保字段顺序和命名与模板完全一致
 
 **标准字段结构**（严格遵循模板）
-**文件命名**：测试用例_YYYY-MM-DDTHH-mm-SS.csv
+**文件命名**：测试用例_YYYY-MM-DDTHH-mm-SS.xlsx
 
 **UI自动化用例导出要求**：
 - cd至创建的文件夹内进行保存
@@ -125,7 +125,7 @@ allowed-tools: [Read, Write, mcp__figma__get_figma_data, mcp__figma__download_fi
    6. 导出Excel和Markdown格式结果
 
    结果文件：
-   - test_cases_20241128.csv (45个测试用例)
+   - test_cases_20241128.xlsx (45个测试用例)
    - ui_tests_20241128.md (12个UI测试用例)
 ```
 
@@ -143,7 +143,7 @@ allowed-tools: [Read, Write, mcp__figma__get_figma_data, mcp__figma__download_fi
    8. 导出Excel和Markdown格式结果
 
    结果文件：
-   - test_cases_20241128.csv (36个测试用例)
+   - test_cases_20241128.xlsx (36个测试用例)
    - ui_tests_20241128.md (18个UI测试用例)
    - test_analysis_report_20241128.md (测试分析报告)
 ```
@@ -180,4 +180,4 @@ pip install python-docx pandas openpyxl PyPDF2
 3. **进行AI智能分析**（需求识别/测试策略制定）
 4. **生成完整的测试用例**（功能测试/UI自动化）
 5. **创建文件夹**
-6. **导出结构化文件**（Excel CSV + Markdown）
+6. **导出结构化文件**（Excel XLSX + Markdown）
