@@ -1,6 +1,6 @@
 ---
 name: prd-to-tc-generator
-description: AI驱动的PRD测试用例生成器，使用Claude智能分析Word/PDF/md文档和Figma设计，创建结构化测试用例表格和自然语言描述的UI自动化测试用例。当Claude需要从PRD文档生成综合测试用例时使用：(1) 需求分析和测试规划，(2) 功能和UI测试用例创建，（3）测试分析报告
+description: AI驱动的PRD测试用例生成器，使用Claude智能分析Word/PDF文档和Figma设计，创建结构化测试用例表格和自然语言描述的UI自动化测试用例。当Claude需要从PRD文档生成综合测试用例时使用：(1) 需求分析和测试规划，(2) 功能和UI测试用例创建，（3）测试分析报告
 allowed-tools: [Read, Write, mcp__figma__get_figma_data, mcp__figma__download_figma_images]
 ---
 
@@ -31,7 +31,6 @@ allowed-tools: [Read, Write, mcp__figma__get_figma_data, mcp__figma__download_fi
 用户提供以下任一格式：
 - Word文档路径 (.docx)
 - PDF文档路径 (.pdf)
-- md文档路径（.md）
 - Figma设计链接
 - 直接粘贴PRD文本内容
 
@@ -41,7 +40,6 @@ allowed-tools: [Read, Write, mcp__figma__get_figma_data, mcp__figma__download_fi
 我使用相应的方式提取原始内容：
 - Word: `python scripts/content_extractor.py --word <文件路径>`
 - PDF: `python scripts/content_extractor.py --pdf <文件路径>`
-- md: **直接ai自己读取**
 - Figma: **直接通过Figma MCP获取设计数据**，无需脚本中间层
 
 #### 阶段2：AI智能分析
@@ -70,61 +68,48 @@ allowed-tools: [Read, Write, mcp__figma__get_figma_data, mcp__figma__download_fi
 - 制定边界值和异常场景
 - 规划验证点
 
-#### 阶段3：功能测试用例生成
+#### 阶段3：AI测试用例生成
 
-**创建输出文件的文件夹**：
-- 在目录`/Users/wwh/Documents/R2ai/AI/AI智能平台/PRDtoTC`创建文件夹
-**文件夹命名**：PRD名称/figma标题名称+当前系统时间（格式：yyyy-MM-dd HH:mm:ss）
-- 后续生成的文件都保存至该文件夹内
-**测试用例**：参考 `references/test_case_template.md`
+**功能测试用例**：参考 `references/test_case_template.md`
 - 正向测试：验证正常业务流程
 - 异常测试：验证错误处理和边界条件
 - 数据测试：验证数据完整性和准确性
 - 集成测试：验证模块间交互
 
-**重要：Excel文件生成规范**
-**必须使用以下方法正确生成Excel文件**：
-
-1. **CSV格式生成法**：
-   ```bash
-   # 先生成CSV格式文件，然后手动转换为xlsx
-   cd "/Users/wwh/Documents/R2ai/AI/AI智能平台/PRDtoTC/[文件夹名]"
-   # 用Write工具创建CSV文件，每行一个测试用例
-   ```
-
-2. **列名规范**：
-   - 必须包含：用例编号,标题,所属分组,维护人,前置条件,步骤描述,预期结果,用例类型,用例等级
-   - 每列用逗号分隔，不要用空格（重要）
-   - 每个测试用例占一行
-   - 如果字段内包含逗号，用双引号包围整个字段
-
-3. **步骤描述和预期结果编写规范**：
-   - 使用【1】、【2】、【3】格式编号，并且在单元格内换行
-   - 每个步骤描述一个具体操作
-   - 步骤之间逻辑清晰，顺序合理
-   - 预期结果必须与步骤描述一一对应
-
-**测试用例导出要求**：
-- cd至创建的文件夹内进行保存
-- 文件命名：测试用例.csv
-- 确保数据按正确列分布，不要全部挤在第一列
-
-
-
-#### 阶段4：UI自动化测试用例生成
-
 **UI自动化测试用例**：参考 `references/ui_prompt_engineering.md`
 - 用自然语言描述的测试步骤
 - 元素位置和交互描述
 - 完整的验证断言和预期结果
+
+#### 阶段4：结果导出
+
+**创建输出文件的文件夹**：
+- 在目录`/Users/wwh/Documents/R2ai/AI/AI智能平台/PRDtoTC`创建文件夹
+**文件夹命名**：PRD名称/figma标题名称+yyyy-MM-dd HH:mm:ss
+- 后续生成的文件都保存至该文件夹内
+
+**功能测试用例XLSX导出要求**：
+- cd至创建的文件夹内进行保存
+**重要：生成XLSX格式文件**
+- **首先参考 `assets/基础用例模板.xlsx` 文件结构**，确保列名和格式完全一致
+
+**模板参考步骤**：
+1. 读取 `assets/基础用例模板.xlsx` 文件（如果存在）
+2. 分析模板的列名结构和格式
+3. 按照模板结构生成对应的xlsx内容
+4. 确保字段顺序和命名与模板完全一致
+
+**标准字段结构**（严格遵循模板）
+**文件命名**：测试用例_yyyy-MM-dd HH:mm:ss.xlsx
+
 **UI自动化用例导出要求**：
 - cd至创建的文件夹内进行保存
 - 使用Markdown格式，包含完整阶段3生成的UI自动化测试用例内容
-**文件命名**：UI测试用例.md
+**文件命名**：UI测试用例_yyyy-MM-dd HH:mm:ss.md
+
 **测试分析报告导出要求**：
 - cd至创建的文件夹内进行保存
-**文件命名**：测试分析报告.md
-
+**文件命名**：测试分析报告_yyyy-MM-dd HH:mm:ss.md
 
 ## 示例使用
 
@@ -134,14 +119,14 @@ allowed-tools: [Read, Write, mcp__figma__get_figma_data, mcp__figma__download_fi
 
 我: 1. 正在提取文档内容...
    2. 完成需求分析，识别出15个功能需求
-   3. 创建文件夹
-   4. 创建生成45个测试用例（含正向/异常/边界测试）
-   5. 创建生成12个UI自动化测试用例
+   3. 生成45个测试用例（含正向/异常/边界测试）
+   4. 创建12个UI自动化测试用例
+   5. 创建文件夹
+   6. 导出Excel和Markdown格式结果
 
    结果文件：
    - test_cases_20241128.xlsx (45个测试用例)
    - ui_tests_20241128.md (12个UI测试用例)
-   - test_analysis_report_20241128.md (测试分析报告)
 ```
 
 ### Figma设计链接示例
@@ -152,9 +137,10 @@ allowed-tools: [Read, Write, mcp__figma__get_figma_data, mcp__figma__download_fi
    2. 获取设计数据：file_key=HYj43oecdPu8gyeH5BaAFl, node_id=130-8805
    3. 分析UI设计，识别出8个页面和25个交互组件
    4. 完成需求分析，推导出12个功能需求
-   5. 创建文件夹
-   6. 创建生成36个测试用例（含UI交互测试、业务流程测试）
-   7. 创建生成18个UI自动化测试用例（自然语言描述）
+   5. 生成36个测试用例（含UI交互测试、业务流程测试）
+   6. 创建18个UI自动化测试用例（自然语言描述）
+   7. 创建文件夹
+   8. 导出Excel和Markdown格式结果
 
    结果文件：
    - test_cases_20241128.xlsx (36个测试用例)
@@ -192,5 +178,6 @@ pip install python-docx pandas openpyxl PyPDF2
 1. **智能识别输入类型**（文档/Figma链接/文本）
 2. **自动提取内容**（脚本解析/MCP获取/直接分析）
 3. **进行AI智能分析**（需求识别/测试策略制定）
-4. **创建文件夹**
-5. **生成并导出完整的测试用例**（功能测试/UI自动化）
+4. **生成完整的测试用例**（功能测试/UI自动化）
+5. **创建文件夹**
+6. **导出结构化文件**（Excel XLSX + Markdown）
